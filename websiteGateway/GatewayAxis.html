@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axis | Family Driver Tracker</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top, #071b3a 0%, #02050d 45%, #000 100%);
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .glow-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(0, 255, 213, 0.18), transparent 28%),
+        radial-gradient(circle at 85% 15%, rgba(0, 80, 255, 0.24), transparent 26%),
+        radial-gradient(circle at 50% 85%, rgba(255, 120, 30, 0.16), transparent 30%);
+      z-index: 0;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 20;
+      padding: 22px 8%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(2, 5, 13, 0.75);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(0, 255, 213, 0.16);
+    }
+
+    .logo {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: #ffffff;
+      text-shadow: 0 0 18px rgba(0, 225, 255, 0.8);
+    }
+
+    .logo span {
+      display: block;
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: #65ffe5;
+      font-weight: 500;
+    }
+
+    nav {
+      display: flex;
+      gap: 28px;
+      font-size: 14px;
+      color: #d7faff;
+    }
+
+    nav a:hover {
+      color: #65ffe5;
+    }
+
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      padding: 140px 8% 70px;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      align-items: center;
+      gap: 60px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border: 1px solid rgba(101, 255, 229, 0.35);
+      border-radius: 999px;
+      color: #65ffe5;
+      background: rgba(101, 255, 229, 0.06);
+      box-shadow: 0 0 24px rgba(101, 255, 229, 0.15);
+      margin-bottom: 28px;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .hero h1 {
+      font-size: clamp(46px, 7vw, 95px);
+      line-height: 0.95;
+      font-weight: 900;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 span {
+      color: #65ffe5;
+      text-shadow: 0 0 25px rgba(101, 255, 229, 0.75);
+    }
+
+    .hero p {
+      color: #c8d7e8;
+      font-size: 19px;
+      line-height: 1.7;
+      max-width: 620px;
+      margin-bottom: 34px;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+
+    .btn {
+      padding: 15px 24px;
+      border-radius: 16px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      transition: 0.25s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #65ffe5, #1687ff);
+      color: #00111b;
+      box-shadow: 0 0 30px rgba(101, 255, 229, 0.35);
+    }
+
+    .btn-secondary {
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+    }
+
+    .btn:hover {
+      transform: translateY(-4px);
+    }
+
+    .product-stage {
+      position: relative;
+      height: 610px;
+      display: grid;
+      place-items: center;
+    }
+
+    .phone {
+      width: 265px;
+      height: 540px;
+      border-radius: 42px;
+      padding: 12px;
+      background: linear-gradient(160deg, #101827, #02050d);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 45px rgba(0, 200, 255, 0.45), 0 0 120px rgba(101, 255, 229, 0.22);
+      position: relative;
+      z-index: 3;
+      animation: float 5s ease-in-out infinite;
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 88px;
+      height: 23px;
+      background: #030712;
+      border-radius: 999px;
+      z-index: 4;
+    }
+
+    .screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 32px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #a9eef7 0%, #f1eef1 46%, #dffcff 100%);
+      color: #071124;
+      position: relative;
+    }
+
+    .map {
+      height: 58%;
+      background:
+        linear-gradient(115deg, transparent 0 48%, rgba(0, 80, 255, 0.85) 49% 52%, transparent 53%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.45) 0 2px, transparent 2px),
+        linear-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+        #d9edf1;
+      background-size: auto, 100% 100%, 42px 42px, 42px 42px;
+      position: relative;
+    }
+
+    .map::before {
+      content: "Live Driver";
+      position: absolute;
+      top: 44px;
+      left: 17px;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.45);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .map::after {
+      content: "Connected • Live GPS";
+      position: absolute;
+      top: 44px;
+      right: 14px;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.45);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 10px;
+      backdrop-filter: blur(10px);
+    }
+
+    .pin {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .pin::after {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 50%;
+      top: 9px;
+      left: 9px;
+    }
+
+    .blue-pin { background: #1d7dff; bottom: 72px; left: 120px; }
+    .red-pin { background: #ff3d3d; top: 116px; right: 42px; }
+
+    .route {
+      position: absolute;
+      width: 8px;
+      height: 190px;
+      background: #176dff;
+      border-radius: 99px;
+      transform: rotate(28deg);
+      right: 72px;
+      top: 132px;
+      box-shadow: 0 0 18px rgba(23, 109, 255, 0.7);
+    }
+
+    .zone {
+      position: absolute;
+      width: 150px;
+      height: 170px;
+      border: 3px solid #ef3434;
+      left: 25px;
+      top: 130px;
+      background: rgba(239, 52, 52, 0.08);
+    }
+
+    .app-cards {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .mini-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .mini-card, .status-card, .alert-card {
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.65);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6);
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .status-card {
+      background: rgba(222, 232, 255, 0.8);
+      font-size: 14px;
+    }
+
+    .status-card small, .alert-card small {
+      display: block;
+      color: #68758b;
+      letter-spacing: 2px;
+      font-size: 9px;
+      margin-bottom: 8px;
+    }
+
+    .alert-card {
+      color: #f04438;
+      background: rgba(255, 230, 230, 0.85);
+      border: 2px solid #ff4d4d;
+      font-size: 12px;
+    }
+
+    .orbit {
+      position: absolute;
+      inset: 30px;
+      border: 1px dashed rgba(101, 255, 229, 0.25);
+      border-radius: 50%;
+      animation: spin 18s linear infinite;
+    }
+
+    .node {
+      position: absolute;
+      width: 125px;
+      height: 125px;
+      border-radius: 50%;
+      background: rgba(7, 25, 50, 0.75);
+      border: 1px solid rgba(101, 255, 229, 0.35);
+      box-shadow: 0 0 34px rgba(101, 255, 229, 0.2);
+      display: grid;
+      place-items: center;
+      color: #65ffe5;
+      font-size: 42px;
+      z-index: 2;
+      backdrop-filter: blur(12px);
+    }
+
+    .node-left { left: 0; top: 45%; }
+    .node-right { right: 0; top: 45%; }
+    .node-bottom { bottom: 0; left: 50%; transform: translateX(-50%); }
+
+    .hardware-box {
+      position: absolute;
+      bottom: 42px;
+      left: 30px;
+      width: 165px;
+      height: 72px;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #061d62, #07143a);
+      border: 1px solid rgba(255,255,255,0.22);
+      box-shadow: 0 0 24px rgba(0, 86, 255, 0.7);
+      transform: rotate(-8deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    .hardware-box span {
+      font-size: 11px;
+      display: block;
+      font-weight: 400;
+      color: #dbe7ff;
+      margin-top: 3px;
+    }
+
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 95px 8%;
+    }
+
+    .section-title {
+      font-size: clamp(34px, 5vw, 68px);
+      margin-bottom: 18px;
+      font-weight: 900;
+    }
+
+    .section-subtitle {
+      color: #b9c7d8;
+      font-size: 18px;
+      line-height: 1.7;
+      max-width: 760px;
+      margin-bottom: 42px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .card {
+      padding: 30px;
+      border-radius: 28px;
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(101, 255, 229, 0.16);
+      box-shadow: 0 0 34px rgba(0,0,0,0.25);
+      min-height: 230px;
+      transition: 0.28s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(101, 255, 229, 0.42);
+      box-shadow: 0 0 45px rgba(101, 255, 229, 0.12);
+    }
+
+    .icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      background: rgba(101,255,229,0.09);
+      border: 1px solid rgba(101,255,229,0.32);
+      margin-bottom: 24px;
+      color: #65ffe5;
+    }
+
+    .card h3 {
+      font-size: 22px;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+
+    .card p {
+      color: #b9c7d8;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 55px;
+      align-items: center;
+    }
+
+    .device-showcase {
+      position: relative;
+      height: 390px;
+      display: grid;
+      place-items: center;
+    }
+
+    .axis-device {
+      width: 420px;
+      height: 150px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, #061d77, #020b39);
+      box-shadow: 0 0 40px rgba(0, 86, 255, 0.8);
+      transform: perspective(900px) rotateX(18deg) rotateY(-14deg);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .axis-device::before,
+    .axis-device::after {
+      content: "";
+      position: absolute;
+      width: 560px;
+      height: 12px;
+      background: #d8dbe2;
+      transform: rotate(28deg);
+      top: 55px;
+      left: -70px;
+      box-shadow: 0 0 12px rgba(255,255,255,0.35);
+    }
+
+    .axis-device::after {
+      transform: rotate(-42deg);
+      top: 70px;
+      left: 80px;
+    }
+
+    .device-title {
+      position: absolute;
+      top: 34px;
+      left: 40px;
+      font-size: 44px;
+      font-weight: 900;
+      z-index: 2;
+    }
+
+    .device-title span {
+      display: block;
+      font-size: 18px;
+      font-weight: 400;
+      color: #e4e8ff;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 18px;
+    }
+
+    .feature-row {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.09);
+    }
+
+    .feature-row strong {
+      color: #65ffe5;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .feature-row p {
+      color: #c5d0df;
+      line-height: 1.55;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+    }
+
+    .step {
+      border-radius: 22px;
+      padding: 22px 16px;
+      min-height: 260px;
+      background: rgba(7, 25, 50, 0.6);
+      border: 1px solid rgba(101, 255, 229, 0.18);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step::before {
+      content: attr(data-step);
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-size: 52px;
+      font-weight: 900;
+      color: rgba(101, 255, 229, 0.08);
+    }
+
+    .step h3 {
+      font-size: 16px;
+      color: #65ffe5;
+      margin-bottom: 16px;
+      padding-top: 35px;
+    }
+
+    .step p {
+      color: #bfccda;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .contact {
+      text-align: center;
+      padding-bottom: 120px;
+    }
+
+    .contact-box {
+      max-width: 850px;
+      margin: auto;
+      padding: 50px;
+      border-radius: 34px;
+      background: linear-gradient(135deg, rgba(101,255,229,0.1), rgba(22,135,255,0.08));
+      border: 1px solid rgba(101,255,229,0.28);
+      box-shadow: 0 0 60px rgba(0, 200, 255, 0.15);
+    }
+
+    .contact-box h2 {
+      font-size: clamp(34px, 5vw, 62px);
+      margin-bottom: 18px;
+    }
+
+    .contact-box p {
+      color: #c2cfdf;
+      line-height: 1.7;
+      font-size: 18px;
+      margin-bottom: 32px;
+    }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      padding: 25px 8%;
+      border-top: 1px solid rgba(101, 255, 229, 0.12);
+      color: #8294ab;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-14px); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 1100px) {
+      .hero, .split {
+        grid-template-columns: 1fr;
+      }
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+      .steps {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      nav {
+        display: none;
+      }
+    }
+
+    @media (max-width: 650px) {
+      header { padding: 18px 5%; }
+      .hero, section { padding-left: 5%; padding-right: 5%; }
+      .product-stage { height: 560px; transform: scale(0.85); }
+      .steps { grid-template-columns: 1fr; }
+      .axis-device { width: 320px; }
+      .device-title { font-size: 34px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="glow-bg"></div>
+
+    <header>
+      <div class="logo">Axis <span>FAMILY DRIVER TRACKER</span></div>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#hardware">Product</a>
+        <a href="#customization">Customization</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <div class="badge">● Real-time family tracking solution</div>
+          <h1>Smarter tracking.<br /><span>Greater peace of mind.</span></h1>
+          <p>
+            Axis is a family driver tracking system that connects a compact GPS hardware unit with a mobile application, allowing parents to monitor live trips, view routes, customize geofences, and receive alerts when important events happen.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#contact">Contact Us</a>
+            <a class="btn btn-secondary" href="#customization">See Customization</a>
+          </div>
+        </div>
+
+        <div class="product-stage">
+          <div class="orbit"></div>
+          <div class="node node-left">▰</div>
+          <div class="node node-right">☁</div>
+          <div class="node node-bottom">⌁</div>
+          <div class="hardware-box">Axis<span>Family Driver Tracker</span></div>
+          <div class="phone">
+            <div class="screen">
+              <div class="map">
+                <div class="zone"></div>
+                <div class="route"></div>
+                <div class="pin blue-pin"></div>
+                <div class="pin red-pin"></div>
+              </div>
+              <div class="app-cards">
+                <div class="mini-row">
+                  <div class="mini-card">25.700000</div>
+                  <div class="mini-card">51.700000</div>
+                </div>
+                <div class="status-card"><small>LAST UPDATE</small>Just now</div>
+                <div class="status-card"><small>STATUS</small>Tracking active</div>
+                <div class="alert-card"><small>ALERT</small>Driver is OUTSIDE safe zone<br />Last exit: 20/4/2026 00:28</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features">
+        <h2 class="section-title">Designed around the app.</h2>
+        <p class="section-subtitle">
+          The hardware collects and transfers the location data, but the real value appears in the Axis mobile application where the family can monitor, understand, and react in real time.
+        </p>
+
+        <div class="grid-3">
+          <div class="card">
+            <div class="icon">⌖</div>
+            <h3>Live Location</h3>
+            <p>View the driver’s current location on an interactive map with continuous GPS updates.</p>
+          </div>
+          <div class="card">
+            <div class="icon">▭</div>
+            <h3>Custom Geofencing</h3>
+            <p>Create safe, school, university, hospital, workplace, or restricted zones based on each family’s needs.</p>
+          </div>
+          <div class="card">
+            <div class="icon">🔔</div>
+            <h3>Instant Notifications</h3>
+            <p>Receive alerts when the driver enters or exits important zones, giving parents immediate awareness.</p>
+          </div>
+          <div class="card">
+            <div class="icon">〽</div>
+            <h3>Route Tracking</h3>
+            <p>Display the full movement path on the map, making it easy to verify where the driver actually went.</p>
+          </div>
+          <div class="card">
+            <div class="icon">◎</div>
+            <h3>Family Safety</h3>
+            <p>Help parents monitor the trip and ensure the family member reaches the intended destination safely.</p>
+          </div>
+          <div class="card">
+            <div class="icon">⚙</div>
+            <h3>Customized Setup</h3>
+            <p>Every customer can define the places they care about, and the application is configured around those areas.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="hardware">
+        <div class="split">
+          <div class="device-showcase">
+            <div class="axis-device">
+              <div class="device-title">Axis <span>Family Driver Tracker</span></div>
+            </div>
+          </div>
+          <div>
+            <h2 class="section-title">Compact hardware. Product-ready design.</h2>
+            <p class="section-subtitle">
+              The tracking unit is built using an integrated ESP32-based board with GPS positioning and 4G cellular connectivity, then placed inside a custom 3D-printed enclosure to make the system protected, portable, and presentable.
+            </p>
+            <div class="feature-list">
+              <div class="feature-row"><div class="icon">芯</div><div><strong>Integrated Board</strong><p>Combines ESP32 processing, GPS positioning, and 4G connectivity in one compact platform.</p></div></div>
+              <div class="feature-row"><div class="icon">◈</div><div><strong>3D-Printed Enclosure</strong><p>Transforms the hardware into a clean physical product while protecting the internal components.</p></div></div>
+              <div class="feature-row"><div class="icon">4G</div><div><strong>Continuous Data Delivery</strong><p>Supports location transmission from the car to the mobile application through the communication path.</p></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="customization">
+        <h2 class="section-title">Customization journey.</h2>
+        <p class="section-subtitle">
+          Axis is not a one-size-fits-all tracker. The product can be configured around the places and alerts that matter most to each family.
+        </p>
+
+        <div class="steps">
+          <div class="step" data-step="01">
+            <h3>Customer Inquiry</h3>
+            <p>The customer discovers Axis through the website and reaches out to discuss their tracking needs.</p>
+          </div>
+          <div class="step" data-step="02">
+            <h3>Consultation</h3>
+            <p>We identify the family member, daily routes, destination types, and the places that require monitoring.</p>
+          </div>
+          <div class="step" data-step="03">
+            <h3>Alert Areas</h3>
+            <p>The customer selects zones such as school, university, hospital, workplace, home, or restricted areas.</p>
+          </div>
+          <div class="step" data-step="04">
+            <h3>Excel Mapping</h3>
+            <p>Each area is organized with its coordinates, zone type, assigned color, and alert behavior.</p>
+          </div>
+          <div class="step" data-step="05">
+            <h3>Geofence Design</h3>
+            <p>Rectangular fences are created around the selected locations and prepared for app integration.</p>
+          </div>
+          <div class="step" data-step="06">
+            <h3>App Delivery</h3>
+            <p>The Axis app is customized with the customer’s geofences, colors, and notification rules.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact" id="contact">
+        <div class="contact-box">
+          <h2>Start your Axis setup.</h2>
+          <p>
+            Tell us the locations you want to monitor, and we will prepare a customized tracking experience built around your family’s needs.
+          </p>
+          <a class="btn btn-primary" href="mailto:axis.tracker@example.com?subject=Axis%20Family%20Driver%20Tracker%20Inquiry">Contact Us by Email</a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>© 2026 Axis Family Driver Tracker</span>
+      <span>Real-time tracking • Geofencing • Notifications</span>
+    </footer>
+  </div>
+</body>
+</html>
